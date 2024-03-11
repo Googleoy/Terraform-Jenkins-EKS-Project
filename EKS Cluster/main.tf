@@ -15,12 +15,12 @@ module "eks" {
       max_size     = 2
       desired_size = 1
 
-      instance_type = ["t2.medium"]
+      instance_type = ["t2.large"]
     }
   }
 
   tags = {
-    Environment = "dev"
+    Environment = "dev" 
     Terraform   = "true"
   }
 }
