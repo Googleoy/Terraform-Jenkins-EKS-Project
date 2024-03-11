@@ -1,3 +1,34 @@
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = "jenkins-vpc"
+  cidr = var.vpc_cidr
+
+  azs = data.aws_availability_zones.azs.names
+
+  private_subnets = var.private_subnet
+  public_subnets  = var.public_subnet
+
+  enable_dns_hostnames = true
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+
+  tags = {
+    "kubernetes.io/cluster/my-eks-cluster" = "shared"
+  }
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/my-eks-cluster" = "shared"
+    "kubernetes.io/role/elb"               = 1
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/cluster/my-eks-cluster" = "shared"
+    "kubernetes.io/role/internal-elb"      = 1
+  }
+
+}
+
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
 
@@ -12,15 +43,15 @@ module "eks" {
   eks_managed_node_groups = {
     nodes = {
       min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      max_size     = 3
+      desired_size = 2
 
-      instance_type = ["t2.large"]
+      instance_type = ["t2.small"]
     }
   }
 
   tags = {
-    Environment = "dev" 
+    Environment = "dev"
     Terraform   = "true"
   }
 }
